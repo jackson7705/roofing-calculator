@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blue Collar Millionaires - Professional Roofing Calculator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #f59e0b;
+            --accent: #f97316;
+            --light-bg: #f3f4f6;
+            --dark-bg: #1f2937;
+            --text: #1f2937;
+            --text-light: #6b7280;
+            --border: #e5e7eb;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--text);
+            background-color: var(--light-bg);
+        }
+        
+        .calculator-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 0.5rem 0.5rem 0 0;
+            position: relative;
+        }
+        
+        .nav-tabs .nav-link {
+            color: var(--text);
+            border: none;
+            padding: 10px 15px;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .nav-tabs .nav-link.active {
+            border: none;
+            border-bottom: 3px solid var(--accent);
+            color: var(--primary);
+            background-color: transparent;
+        }
+        
+        .card {
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+            border: none;
+        }
+        
+        .card-header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem;
+            font-weight: 600;
+            border-radius: 0.5rem 0.5rem 0 0 !important;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .btn-primary:hover {
+            background-color: #1e40af;
+            border-color: #1e40af;
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary);
+            border-color: var(--secondary);
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 0.25rem rgba(249, 115, 22, 0.25);
+        }
+        
+        /* Material cards */
+        .material-card {
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            height: 100%;
+        }
+        
+        .material-card:hover {
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .material-card.selected {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.5);
+        }
+        
+        .material-image {
+            height: 100px;
+            background-color: var(--light-bg);
+            border-radius: 0.25rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Results section */
+        .results {
+            background-color: #f8fafc;
+            border: 2px solid var(--primary);
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+        
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        
+        /* Range slider */
+        .range-slider-container {
+            margin-bottom: 1rem;
+        }
+        
+        .tab-pane {
+            padding: 20px 0;
+        }
+        
+        /* Summary page styling */
+        .summary-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .summary-section h3 {
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .profit-indicator {
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+        
+        .profit-good {
+            background-color: #10b981;
+            color: white;
+        }
+        
+        .profit-warning {
+            background-color: #f59e0b;
+            color: white;
+        }
+        
+        .profit-danger {
+            background-color: #ef4444;
+            color: white;
+        }
+        
+        #costBreakdownChart, #comparisonChart {
+            max-height: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator-container">
+        <div class="header">
+            <div class="container-fluid">
+                <h1 class="display-5 fw-bold mb-2">Roofing Profit Calculator</h1>
+                <p class="fs-4">Blue Collar Millionaires Community</p>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-bottom shadow-sm p-4">
+            <ul class="nav nav-tabs" id="calculatorTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="job-info-tab" data-bs-toggle="tab" data-bs-target="#job-info" type="button" role="tab" aria-controls="job-info" aria-selected="true">
+                        <i class="fas fa-info-circle me-2"></i>Job Info
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="materials-tab" data-bs-toggle="tab" data-bs-target="#materials" type="button" role="tab" aria-controls="materials" aria-selected="false">
+                        <i class="fas fa-boxes me-2"></i>Materials
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="labor-tab" data-bs-toggle="tab" data-bs-target="#labor" type="button" role="tab" aria-controls="labor" aria-selected="false">
+                        <i class="fas fa-hard-hat me-2"></i>Labor
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="overhead-tab" data-bs-toggle="tab" data-bs-target="#overhead" type="button" role="tab" aria-controls="overhead" aria-selected="false">
+                        <i class="fas fa-building me-2"></i>Overhead
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="profit-tab" data-bs-toggle="tab" data-bs-target="#profit" type="button" role="tab" aria-controls="profit" aria-selected="false">
+                        <i class="fas fa-chart-line me-2"></i>Profit
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="summary-tab" data-bs-toggle="tab" data-bs-target="#summary" type="button" role="tab" aria-controls="summary" aria-selected="false">
+                        <i class="fas fa-file-invoice-dollar me-2"></i>Summary
+                    </button>
+                </li>
+            </ul>
+            
+            <div class="tab-content" id="calculatorTabContent">
+                <!-- Job Info Tab -->
+                <div class="tab-pane fade show active" id="job-info" role="tabpanel" aria-labelledby="job-info-tab">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-clipboard-list me-2"></i> Project Details
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-6 mb-3">
+                                    <label for="customer-name" class="form-label fw-bold">Customer Name</label>
+                                    <input type="text" class="form-control" id="customer-name" placeholder="Enter customer name">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="job-address" class="form-label fw-bold">Job Address</label>
+                                    <input type="text" class="form-control" id="job-address" placeholder="Enter job address">
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-4 mb-3">
+                                    <label for="job-date" class="form-label fw-bold">Start Date</label>
+                                    <input type="date" class="form-control" id="job-date">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="roof-type" class="form-label fw-bold">Roof Type</label>
+                                    <select class="form-select" id="roof-type">
+                                        <option value="gable">Gable</option>
+                                        <option value="hip">Hip</option>
+                                        <option value="flat">Flat</option>
+                                        <option value="mansard">Mansard</option>
+                                        <option value="gambrel">Gambrel</option>
+                                        <option value="shed">Shed</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="roof-complexity" class="form-label fw-bold">Complexity</label>
+                                    <select class="form-select" id="roof-complexity">
+                                        <option value="simple">Simple (Few penetrations)</option>
+                                        <option value="moderate">Moderate (Some valleys, dormers)</option>
+                                        <option value="complex">Complex (Multiple valleys, dormers)</option>
+                                        <option value="very-complex">Very Complex (Custom features)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6 mb-3">
+                                    <label for="roof-squares" class="form-label fw-bold">Total Roof Area</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="roof-squares" placeholder="Enter number">
+                                        <span class="input-group-text">Squares</span>
+                                    </div>
+                                    <div class="form-text">1 square = 100 square feet</div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="roof-pitch" class="form-label fw-bold">Roof Pitch</label>
+                                    <select class="form-select" id="roof-pitch">
+                                        <option value="2:12">2:12 (9.5° - Low)</option>
+                                        <option value="3:12">3:12 (14.0°)</option>
+                                        <option value="4:12">4:12 (18.4°)</option>
+                                        <option value="5:12">5:12 (22.6°)</option>
+                                        <option value="6:12">6:12 (26.6° - Medium)</option>
+                                        <option value="7:12">7:12 (30.3°)</option>
+                                        <option value="8:12">8:12 (33.7°)</option>
+                                        <option value="9:12">9:12 (36.9°)</option>
+                                        <option value="10:12">10:12 (39.8°)</option>
+                                        <option value="12:12">12:12 (45.0° - Steep)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6 mb-3">
+                                    <label for="stories" class="form-label fw-bold">Stories</label>
+                                    <select class="form-select" id="stories">
+                                        <option value="1">1 Story</option>
+                                        <option value="2">2 Stories</option>
+                                        <option value="3">3+ Stories</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="location-factor" class="form-label fw-bold">Location Factor</label>
+                                    <select class="form-select" id="location-factor">
+                                        <option value="urban">Urban (Limited access/parking)</option>
+                                        <option value="suburban">Suburban (Standard access)</option>
+                                        <option value="rural">Rural (Extended travel required)</option>
+                                        <option value="remote">Remote (Difficult access)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="job-notes" class="form-label fw-bold">Job Notes</label>
+                                <textarea class="form-control" id="job-notes" rows="3" placeholder="Enter any special considerations or notes about this job"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-end mt-3">
+                        <button class="btn btn-primary" id="next-materials">
+                            Next: Materials <i class="fas fa-arrow-right ms-2"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Materials Tab -->
+                <div class="tab-pane fade" id="materials" role="tabpanel" aria-labelledby="materials-tab">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-boxes me-2"></i> Roofing Materials
+                        </div>
+                        <div class="card-body">
+                            <h5 class="mb-3">Shingle Type</h5>
+                            <div class="row mb-4 g-3">
+                                <div class="col-md-4">
+                                    <div class="material-card" data-material="3-tab" onclick="selectMaterial(this, 'shingle')">
+                                        <div class="material-image bg-light text-center">
+                                            <i class="fas fa-th fa-2x text-secondary"></i>
+                                        </div>
+                                        <h5 class="mt-2">3-Tab Asphalt</h5>
+                                        <p class="text-muted mb-1">$75-90 per square</p>
+                                        <p class="text-muted">20-25 year lifespan</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="material-card" data-material="architectural" onclick="selectMaterial(this, 'shingle')">
+                                        <div class="material-image bg-light text-center">
+                                            <i class="fas fa-th-large fa-2x text-secondary"></i>
+                                        </div>
+                                        <h5 class="mt-2">Architectural</h5>
+                                        <p class="text-muted mb-1">$90-125 per square</p>
+                                        <p class="text-muted">30-50 year lifespan</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="material-card" data-material="premium" onclick="selectMaterial(this, 'shingle')">
+                                        <div class="material-image bg-light text-center">
+                                            <i class="fas fa-crown fa-2x text-secondary"></i>
+                                        </div>
+                                        <h5 class="mt-2">Premium</h5>
+                                        <p class="text-muted mb-1">$150-300+ per square</p>
+                                        <p class="text-muted">Lifetime warranty</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="shingle-type" value="">
+                            
+                            <h5 class="mb-3">Underlayment</h5>
+                            <div class="row mb-4 g-3">
+                                <div class="col-md-6">
+                                    <div class="material-card" data-material="felt" onclick="selectMaterial(this, 'underlayment')">
+                                        <div class="material-image bg-light text-center">
+                                            <i class="fas fa-scroll fa-2x text-secondary"></i>
+                                        </div>
+                                        <h5 class="mt-2">Felt (15# or 30#)</h5>
+                                        <p class="text-muted mb-1">$15-25 per square</p>
+                                        <p class="text-muted">Standard protection</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="material-card" data-material="synthetic" onclick="selectMaterial(this, 'underlayment')">
+                                        <div class="material-image bg-light text-center">
+                                            <i class="fas fa-layer-group fa-2x text-secondary"></i>
+                                        </div>
+                                        <h5 class="mt-2">Synthetic</h5>
+                                        <p class="text-muted mb-1">$35-50 per square</p>
+                                        <p class="text-muted">Enhanced protection</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="underlayment-type" value="">
+                            
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="checkbox" id="drip-edge">
+                                        <label class="form-check-label fw-bold" for="drip-edge">
+                                            Drip Edge
+                                        </label>
+                                    </div>
+                                    <div class="ms-4 mb-3">
+                                        <label for="drip-edge-ln-ft" class="form-label">Linear Feet</label>
+                                        <input type="number" class="form-control" id="drip-edge-ln-ft" placeholder="Linear feet" disabled>
+                                    </div>
+                                    
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="checkbox" id="ridge-vent">
+                                        <label class="form-check-label fw-bold" for="ridge-vent">
+                                            Ridge Vent
+                                        </label>
+                                    </div>
+                                    <div class="ms-4 mb-3">
+                                        <label for="ridge-vent-ln-ft" class="form-label">Linear Feet</label>
+                                        <input type="number" class="form-control" id="ridge-vent-ln-ft" placeholder="Linear feet" disabled>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="checkbox" id="ice-water-shield">
+                                        <label class="form-check-label fw-bold" for="ice-water-shield">
+                                            Ice &amp; Water Shield
+                                        </label>
+                                    </div>
+                                    <div class="ms-4 mb-3">
+                                        <label for="ice-water-squares" class="form-label">Squares</label>
+                                        <input type="number" class="form-control" id="ice-water-squares" placeholder="Number of squares" disabled>
+                                    </div>
+                                    
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="checkbox" id="starter-strip">
+                                        <label class="form-check-label fw-bold" for="starter-strip">
+                                            Starter Strip
+                                        </label>
+                                    </div>
+                                    <div class="ms-4">
+                                        <label for="starter-strip-ln-ft" class="form-label">Linear Feet</label>
+                                        <input type="number" class="form-control" id="starter-strip-ln-ft" placeholder="Linear feet" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="waste-factor" class="form-label fw-bold">Waste Factor</label>
+                                        <div class="range-slider-container">
+                                            <input type="range" class="form-range" id="waste-factor" min="5" max="20" value="10" step="1">
+                                            <div class="d-flex justify-content-between">
+                                                <span>5%</span>
+                                                <span>10%</span>
+                                                <span>15%</span>
+                                                <span>20%</span>
+                                            </div>
+                                            <div class="text-center mt-2">
+                                                Selected: <span id="waste-factor-value" class="fw-bold text-primary">10%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="delivery-fee" class="form-label fw-bold">Delivery Fee</label>
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" class="form-control" id="delivery-fee" placeholder="0.00">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card mb-4">
+                                <div class="card-header bg-light text-dark">
+                                    <h5 class="mb-0">Materials Cost Summary</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="results">
+                                        <div class="result-item">
+                                            <span class="result-label">Shingles:</span>
+                                            <span class="result-value" id="shingles-cost">$0.00</span>
+                                        </div>
+                                        <div class="result-item">
+                                            <span class="result-label">Underlayment:</span>
+                                            <span class="result-value" id="underlayment-cost">$0.00</span>
+                                        </div>
+                                        <div class="result-item">
+                                            <span class="result-label">Additional Materials:</span>
+                                            <span class="result-value" id="additional-materials-cost">$0.00</span>
+                                        </div>
+                                        <div class="result-item">
+                                            <span class="result-label">Waste Factor (<span id="waste-percent">10</span>%):</span>
+                                            <span class="result-value" id="waste-cost">$0.00</span>
+                                        </div>
+                                        <div class="result-item">
+                                            <span class="result-label">Delivery Fee:</span>
+                                            <span class="result-value" id="delivery-cost">$0.00</span>
+                                        </div>
+                                        <div class="result-item fw-bold fs-5 border-top pt-2 mt-2">
+                                            <span class="result-label">Total Materials Cost:</span>
+                                            <span class="result-value text-primary" id="total-materials-cost">$0.00</span>
+                                        </div>
+                                        <div class="result-item small text-secondary">
+                                            <span class="result-label">Cost Per Square:</span>
+                                            <span id="per-square-material-cost">$0.00</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-3">
+                        <button class="btn btn-secondary" id="prev-job-info">
+                            <i class="fas fa-arrow-left me-2"></i> Previous: Job Info
+                        </button>
+                        <button class="btn btn-primary" id="next-labor">
+                            Next: Labor <i class="fas fa-arrow-right ms-2"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Labor Tab -->
+                <div class="tab-pane fade" id="labor" role="tabpanel" aria-labelledby="labor-tab">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-hard-hat me-2"></i> Labor Costs
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <h5 class="mb-3">Tear-off Required?</h5>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="radio" name="tear-off" id="tear-off-yes" value="yes" checked>
+                                        <label class="form-check-label" for="tear-off-yes">
+                                            Yes
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="radio" name="tear-off" id="tear-off-no" value="no">
+                                        <label class="form-check-label" for="tear-off-no">
+                                            No (Overlay)
+                                        </label>
+                                    </div>
+                                    <div id="tear-off-details">
+                                        <label for="tear-off-layers" class="form-label">Number of Layers to Remove:</label>
+                                        <select class="form-select" id="tear-off-layers">
+                                            <option value="1">1 Layer</option>
+                                            <option value="2">2 Layers</option>
+                                            <option value="3">3+ Layers</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <h5 class="mb-3">Labor Calculation Method</h5>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="radio" name="labor-method" id="labor-per-square" value="per-square" checked>
+                                        <label class="form-check-label" for="labor-per-square">
+                                            Per Square
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="radio" name="labor-method" id="labor-hourly" value="hourly">
+                                        <label class="form-check-label" for="labor-hourly">
+                                            Hourly Rate
+                                        </label>
+                                    </div>
+                                    <div id="per-square-details">
+                                        <label for="per-square-rate" class="form-label">Labor Rate Per Square ($):</label>
+                                        <input type="number" class="form-control" id="per-square-rate" placeholder="Labor cost per square">
+                                    </div>
+                                    <div id="hourly-details" style="display:none;">
+                                        <div class="row g-2 mb-2">
+                                            <div class="col-6">
+                                                <label for="hourly-rate" class="form-label">Hourly Rate ($):</label>
+                                                <input type="number" class="form-control" id="hourly-rate" placeholder="Hourly rate">
+                                            </div>
+                                            <div class="col-6">
+                                                <label for="crew-size" class="form-label">Crew Size:</label>
+                                                <input type="number" class="form-control" id="crew-size" placeholder="Number of workers">
+                                            </div>
+                                        </div>
+                                        <div>
